@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  dina-db:
+    image: "postgres:10"
+    environment:
+      POSTGRES_DB: dina
+      POSTGRES_PASSWORD: pg1234
+      POSTGRES_USER: pguser
+
+  init-db:
+    image: "aafcbicoe/dina-db-init-container:dev"
+    environment:
+      POSTGRES_DB: dina
+      POSTGRES_PASSWORD: pg1234
+      POSTGRES_HOST: dina-db
+      POSTGRES_USER: pguser
+    depends_on:
+      - "dina-db"
