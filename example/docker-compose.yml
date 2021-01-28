@@ -15,5 +15,17 @@ services:
       POSTGRES_PASSWORD: pg1234
       POSTGRES_HOST: dina-db
       POSTGRES_USER: pguser
+
+      DINA_DB: agent collection
+
+      MIGRATION_USER_agent: migration_user_agent
+      MIGRATION_USER_PW_agent: muagent123
+      WEB_USER_agent: web_user_agent
+      WEB_USER_PW_agent: wuagent321
+
+      MIGRATION_USER_collection: migration_user_collection
+      MIGRATION_USER_PW_collection: mucoll123
+      WEB_USER_collection: web_user_collection
+      WEB_USER_PW_collection: wucoll321
     depends_on:
       - "dina-db"

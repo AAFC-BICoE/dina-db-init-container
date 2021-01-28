@@ -5,7 +5,20 @@ init containers: specialized containers that run before application containers a
 
 Source: https://docs.okd.io/latest/nodes/containers/nodes-containers-init.html
 
+## Environment Variables
 
+List (space separated) of all DINA databases to create:
+
+`DINA_DB=agent collection`
+
+User variable pattern using the database as suffix: 
+
+```
+MIGRATION_USER_dbname
+MIGRATION_USER_PW_dbname
+WEB_USER_dbname
+WEB_USER_PW_dbname
+```
 
 ## Example
 

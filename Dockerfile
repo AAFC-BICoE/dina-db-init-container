@@ -13,5 +13,5 @@ RUN chmod +x /work/*.sh
 
 USER user
 
-ENTRYPOINT ["sh","/work/init.sh"]
+ENTRYPOINT ["bash","/work/init.sh"]
 
