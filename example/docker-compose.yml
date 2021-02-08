@@ -18,6 +18,7 @@ services:
 
       DINA_DB: agent collection
 
+      PREFIX_agent: xzy
       MIGRATION_USER_agent: migration_user_agent
       MIGRATION_USER_PW_agent: muagent123
       WEB_USER_agent: web_user_agent
