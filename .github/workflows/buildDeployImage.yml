@@ -9,6 +9,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
+      - uses: actions/checkout@v2
       - name: Set VERSION_TAG ENV variable
         run: |
           echo "VERSION_TAG=$(cat version.txt)" >> $GITHUB_ENV
