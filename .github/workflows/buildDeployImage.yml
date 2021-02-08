@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
 
-  build-push:
+  push:
     name: Build Docker Image and Push
     needs: [build]
     runs-on: ubuntu-latest
