@@ -3,10 +3,8 @@ name: Build Docker Image and Push to DockerHub
 on: [push]
 
 jobs:
-
   push:
     name: Build Docker Image and Push
-    needs: [build]
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
 
