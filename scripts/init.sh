@@ -23,5 +23,13 @@ for curr_db in ${db_array[@]}; do
   fi
 
   ./createDinaDatabase.sh ${curr_db} ${db_schema_name} ${!mu_var} ${!mu_pwd_var} ${!wu_var} ${!wu_pwd_var}
+
+  pg_ext_var=PG_EXTENSION_${curr_db}
+  pg_ext=${!pg_ext_var}
+  if [ -n "$pg_ext" ]; then
+    echo "Postgres Extension : ${pg_ext}"
+    ./createPostgreExtension.sh ${pg_ext} ${curr_db} ${db_schema_name}
+  fi
+
 done
 

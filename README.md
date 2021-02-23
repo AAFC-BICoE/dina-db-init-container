@@ -30,6 +30,13 @@ A prefix for the database name can also be provided:
 PREFIX_dbname
 ```
 
+1 Postgres extension can be added (currently limited to 1):
+
+```
+PG_EXTENSION_dbname
+```
+Note that the extension must be available on the server.
+
 ## Example
 
 Build dina-db-init-container container:
