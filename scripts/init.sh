@@ -13,6 +13,8 @@ for curr_db in ${db_array[@]}; do
   wu_var=WEB_USER_${curr_db}
   wu_pwd_var=WEB_USER_PW_${curr_db}
   db_schema_name=${curr_db}
+  pg_ext_var=PG_EXTENSION_${curr_db}
+  pg_ext=${!pg_ext_var}
 
   db_prefix_var=PREFIX_${curr_db}
   db_prefix=${!db_prefix_var}
