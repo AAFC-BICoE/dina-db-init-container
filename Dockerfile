@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.18
 RUN apk --no-cache add gettext postgresql-client bash
 
 RUN adduser --disabled-password --shell=/bin/bash user
@@ -14,4 +14,3 @@ RUN chmod +x /work/*.sh
 USER user
 
 ENTRYPOINT ["bash","/work/init.sh"]
-

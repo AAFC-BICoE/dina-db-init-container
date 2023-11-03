@@ -8,8 +8,14 @@ export WEB_USER=web_user
 
 if [ -n "$USE_V2" ]; then
   echo "Using script v2"
-  ./createDatabase.sh "${DB_NAME}"
-  ./createUser.sh "${DB_NAME}" "${DB_USER}" "${DB_PASSWORD}"
+
+  if [ -n "$DB_NAME" ]; then
+    ./createDatabase.sh "${DB_NAME}"
+    ./createUser.sh "${DB_NAME}" "${DB_USER}" "${DB_PASSWORD}"
+  else
+     echo "Using existing database $POSTGRES_DB"
+    ./createUser.sh "${POSTGRES_DB}" "${DB_USER}" "${DB_PASSWORD}"
+  fi
 else
   db_array=($DINA_DB)
   for curr_db in ${db_array[@]}; do
