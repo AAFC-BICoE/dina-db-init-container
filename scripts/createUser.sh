@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script will only run if the database does NOT already exist
+# This script will only run if the user does NOT already exist
 # arguments: (1) database name, (2) user name, (3) user password
 
 set +e
