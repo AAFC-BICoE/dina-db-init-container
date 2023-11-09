@@ -4,17 +4,26 @@ services:
   dina-db:
     image: "postgres:10"
     environment:
-      POSTGRES_DB: dina
+      POSTGRES_DB: my_db
       POSTGRES_PASSWORD: pg1234
       POSTGRES_USER: pguser
 
   init-db:
     image: "aafcbicoe/dina-db-init-container:dev"
     environment:
-      POSTGRES_DB: dina
+#     the database and the user must already be set on the Postgres server
+      POSTGRES_DB: my_db
       POSTGRES_PASSWORD: pg1234
       POSTGRES_HOST: dina-db
       POSTGRES_USER: pguser
+
+#      v2 example
+#      USE_V2: true
+#      DB_USER: keycloak_user
+#      DB_PASSWORD: kjasfkjfekjef
+
+#      to create a new database
+#      DB_NAME: my_db2
 
       DINA_DB: agent collection
 

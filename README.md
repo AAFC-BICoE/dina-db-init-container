@@ -43,3 +43,22 @@ Build dina-db-init-container container:
 `docker build -t aafcbicoe/dina-db-init-container:dev .`
 
 See `docker-compose` file in the `example` folder.
+
+
+# Version 2
+v2 aims at making db-init-container more generic so it can be used to setup databases that are not used by a dina module.
+
+The following environment variables will use the already existing `mydb` to create the provided user (including `GRANT CONNECT`).
+```
+USE_V2: true
+POSTGRES_DB: mydb
+POSTGRES_USER: pguser
+POSTGRES_PASSWORD: pg1234
+POSTGRES_HOST: dina-db
+
+DB_USER: my_user
+DB_PASSWORD: secret_password
+```
+
+It is also possible to create a new database by additionally setting the variable `DB_NAME`. In that case, 
+the user will be granted connect on that database.
