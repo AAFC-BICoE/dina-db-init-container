@@ -4,7 +4,7 @@ services:
   dina-db:
     image: "postgres:10"
     environment:
-      POSTGRES_DB: keycloak
+      POSTGRES_DB: my_db
       POSTGRES_PASSWORD: pg1234
       POSTGRES_USER: pguser
 
