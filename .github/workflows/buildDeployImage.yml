@@ -8,8 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       push_to_docker_hub: false
-    if: github.ref == 'refs/heads/main' && env.push_to_docker_hub == 'true'
-
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Set VERSION_TAG ENV variable
@@ -29,6 +28,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Image and Push
+        if: env.push_to_docker_hub == 'true'
         uses: docker/build-push-action@v3
         with:
           context: .
