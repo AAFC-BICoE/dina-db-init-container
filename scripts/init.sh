@@ -16,6 +16,18 @@ if [ -n "$USE_V2" ]; then
      echo "Using existing database $POSTGRES_DB"
     ./createUser.sh "${POSTGRES_DB}" "${DB_USER}" "${DB_PASSWORD}"
   fi
+elif [ -n "$PG_RESTORE" ]; then
+  if [ -n "$PG_DUMP_PATH" ]; then
+    # Check if the dump file is non-null
+    if [ ! -s "$PG_DUMP_PATH" ]; then
+      echo "The dump file is null or does not exist. Skipping restore..."
+    else
+      ./createDatabase.sh "${POSTGRES_DB}"
+      ./restoreDatabase.sh "${POSTGRES_DB}" "${DB_USER}" "${DB_PASSWORD}" "${PG_DUMP_PATH}"
+    fi
+  else
+    echo "PG_DUMP_PATH is not set. Skipping restore..."
+  fi
 else
   db_array=($DINA_DB)
   for curr_db in ${db_array[@]}; do
