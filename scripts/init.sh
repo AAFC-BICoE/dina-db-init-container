@@ -23,7 +23,7 @@ elif [ -n "$PG_RESTORE" ]; then
       echo "The dump file is null or does not exist. Skipping restore..."
     else
       ./createDatabase.sh "${POSTGRES_DB}"
-      ./restoreDatabase.sh "${POSTGRES_DB}" "${DB_USER}" "${DB_PASSWORD}" "${PG_DUMP_PATH}"
+      ./restoreDatabase.sh "${PG_DUMP_PATH}"
     fi
   else
     echo "PG_DUMP_PATH is not set. Skipping restore..."

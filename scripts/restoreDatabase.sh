@@ -5,27 +5,26 @@
 
 set +e
 
-POSTGRES_DB=$1
-DB_USER=$2
-DB_PASSWORD=$3
-PG_DUMP_PATH=$4
-DECODED_DUMP_PATH="/tmp/decoded_dump.tar"
+PG_DUMP_PATH=$1
+DECODED_DUMP_PATH="/tmp/decoded_dump.sql"
 
-export PGPASSWORD="$DB_PASSWORD"
+export PGPASSWORD="$POSTGRES_PASSWORD"
 
-
-# Print the file path for debugging
+# Print the input arguments for debugging
+echo "Database Name: $POSTGRES_DB"
+echo "Database User: $POSTGRES_USER"
 echo "Encoded dump file path: '$PG_DUMP_PATH'"
+echo "PostgreSQL Host: $POSTGRES_HOST"
 
-# Check if the ENCODED_DUMP_PATH variable is set
+# Check if the PG_DUMP_PATH variable is set
 if [ -z "$PG_DUMP_PATH" ]; then
   echo "Error: PG_DUMP_PATH is not set. Exiting..."
   exit 1
 fi
 
-# Decode the base64-encoded tar file
+# Decode the base64-encoded sql file
 if [ -f "$PG_DUMP_PATH" ]; then
-  echo "Decoding the base64-encoded tar file..."
+  echo "Decoding the base64-encoded sql file..."
   base64 -d "$PG_DUMP_PATH" > "$DECODED_DUMP_PATH"
 else
   echo "Encoded dump file does not exist at path: '$PG_DUMP_PATH'"
@@ -38,8 +37,23 @@ if [ ! -s "$DECODED_DUMP_PATH" ]; then
   exit 1
 fi
 
-# Restore the database from the dump file with --clean option
-echo "Restoring database $POSTGRES_DB from $DECODED_DUMP_PATH with --clean option"
-pg_restore --clean -U "$DB_USER" -h $POSTGRES_HOST -d "$POSTGRES_DB" "$DECODED_DUMP_PATH"
+# Print the decoded file path for debugging
+echo "Decoded dump file path: '$DECODED_DUMP_PATH'"
 
-echo "Database $POSTGRES_DB restored successfully."
+# Check if PostgreSQL server is running
+echo "Checking PostgreSQL server connection..."
+pg_isready -h $POSTGRES_HOST -U $POSTGRES_USER
+if [ $? -ne 0 ]; then
+  echo "PostgreSQL server is not running or not accessible. Exiting..."
+  exit 1
+fi
+
+# Restore the database from the dump file
+echo "Restoring database $POSTGRES_DB from $DECODED_DUMP_PATH"
+psql -h $POSTGRES_HOST -f "$DECODED_DUMP_PATH" -U $POSTGRES_USER $POSTGRES_DB
+
+if [ $? -eq 0 ]; then
+    echo "Database $POSTGRES_DB restored successfully."
+else
+    echo "Database restoration failed."
+fi
