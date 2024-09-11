@@ -5,7 +5,7 @@
 
 set +e
 
-PG_DUMP_PATH=$1
+DB_DUMP_FILE_PATH=$1
 DECODED_DUMP_PATH="/tmp/decoded_dump.sql"
 
 export PGPASSWORD="$POSTGRES_PASSWORD"
@@ -13,21 +13,21 @@ export PGPASSWORD="$POSTGRES_PASSWORD"
 # Print the input arguments for debugging
 echo "Database Name: $POSTGRES_DB"
 echo "Database User: $POSTGRES_USER"
-echo "Encoded dump file path: '$PG_DUMP_PATH'"
+echo "Encoded dump file path: '$DB_DUMP_FILE_PATH'"
 echo "PostgreSQL Host: $POSTGRES_HOST"
 
-# Check if the PG_DUMP_PATH variable is set
-if [ -z "$PG_DUMP_PATH" ]; then
-  echo "Error: PG_DUMP_PATH is not set. Exiting..."
+# Check if the DB_DUMP_FILE_PATH variable is set
+if [ -z "$DB_DUMP_FILE_PATH" ]; then
+  echo "Error: DB_DUMP_FILE_PATH is not set. Exiting..."
   exit 1
 fi
 
 # Decode the base64-encoded sql file
-if [ -f "$PG_DUMP_PATH" ]; then
+if [ -f "$DB_DUMP_FILE_PATH" ]; then
   echo "Decoding the base64-encoded sql file..."
-  base64 -d "$PG_DUMP_PATH" > "$DECODED_DUMP_PATH"
+  base64 -d "$DB_DUMP_FILE_PATH" > "$DECODED_DUMP_PATH"
 else
-  echo "Encoded dump file does not exist at path: '$PG_DUMP_PATH'"
+  echo "Encoded dump file does not exist at path: '$DB_DUMP_FILE_PATH'"
   exit 1
 fi
 
