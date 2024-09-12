@@ -1,5 +1,6 @@
 FROM alpine:3.18
 RUN apk --no-cache add gettext postgresql-client bash
+RUN apk add --no-cache coreutils
 
 RUN adduser --disabled-password --shell=/bin/bash user
 

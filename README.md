@@ -62,3 +62,22 @@ DB_PASSWORD: secret_password
 
 It is also possible to create a new database by additionally setting the variable `DB_NAME`. In that case, 
 the user will be granted connect on that database.
+
+# RESTORE_DB
+Restore_DB aims at making db-init-container more flexible for deployment in allowing the database to be restore from a pg_dumpall generated backup.
+That way it can be used to replicate databases that require issue replication and/or assist in recovery scenarios.
+
+The first two environment variables below are needed for this feature, where a flag is set to enable the feature and the a file path is provided with the mounted
+dump file within the container.
+```
+RESTORE_DB: true
+DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql"
+
+POSTGRES_DB: mydb
+POSTGRES_USER: pguser
+POSTGRES_PASSWORD: pg1234
+POSTGRES_HOST: dina-db
+
+DB_USER: my_user
+DB_PASSWORD: secret_password
+```
