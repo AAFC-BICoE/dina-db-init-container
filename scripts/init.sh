@@ -22,6 +22,7 @@ elif [ "${RESTORE_DB,,}" = "true" ]; then
     if [ ! -s "$DB_DUMP_FILE_PATH" ]; then
       echo "The dump file is null or does not exist. Skipping restore..."
     else
+      ./createDatabase.sh "${POSTGRES_DB}"
       ./restoreDatabase.sh "${DB_DUMP_FILE_PATH}"
     fi
   else
