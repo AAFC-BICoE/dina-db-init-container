@@ -22,8 +22,21 @@ elif [ "${RESTORE_DB,,}" = "true" ]; then
     if [ ! -s "$DB_DUMP_FILE_PATH" ]; then
       echo "The dump file is null or does not exist. Skipping restore..."
     else
-      ./createDatabase.sh "${POSTGRES_DB}"
+      #./createDatabase.sh "${POSTGRES_DB}"
       ./restoreDatabase.sh "${DB_DUMP_FILE_PATH}"
+      
+      # if we need to reset users
+      if [ "${RESET_USERS,,}" = "true" ]; then
+        db_array=($DINA_DB)
+        for curr_db in ${db_array[@]}; do
+          mu_var=MIGRATION_USER_${curr_db}
+          mu_pwd_var=MIGRATION_USER_PW_${curr_db}
+          wu_var=WEB_USER_${curr_db}
+          wu_pwd_var=WEB_USER_PW_${curr_db}
+          ./resetUser.sh ${!wu_var} ${!wu_pwd_var}
+          ./resetUser.sh ${!mu_var} ${!wu_pwd_var}
+        done
+      fi
     fi
   else
     echo "DB_DUMP_FILE_PATH is not set. Skipping restore..."
