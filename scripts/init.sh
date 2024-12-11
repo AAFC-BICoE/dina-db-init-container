@@ -34,7 +34,7 @@ elif [ "${RESTORE_DB,,}" = "true" ]; then
           wu_var=WEB_USER_${curr_db}
           wu_pwd_var=WEB_USER_PW_${curr_db}
           ./resetUser.sh ${!wu_var} ${!wu_pwd_var}
-          ./resetUser.sh ${!mu_var} ${!wu_pwd_var}
+          ./resetUser.sh ${!mu_var} ${!mu_pwd_var}
         done
       fi
     fi

@@ -7,9 +7,9 @@ set +e
 
 export PGPASSWORD="$POSTGRES_PASSWORD"
 
-user_exists=$(psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -qt -c "SELECT 1 FROM pg_roles WHERE rolname = '$1'")
+user_count=$(psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -t -c "SELECT COUNT(*) FROM pg_roles WHERE rolname = '$1'")
 
-if [ "$user_exists" = "1" ]; then
+if [[ $user_count -eq 1 ]]; then
   psql -q -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -qt -c "ALTER USER $1 WITH PASSWORD '$2'"
  
 else
