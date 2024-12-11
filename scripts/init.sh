@@ -68,11 +68,6 @@ resetUser() {
     ./resetUser.sh ${!wu_var} ${!wu_pwd_var}
     ./resetUser.sh ${!mu_var} ${!mu_pwd_var}
   done
-
-  # Reset keycloak user password
-  ku_var=DB_USER
-  ku_pwd_var=DB_PASSWORD
-  ./resetUser.sh ${!ku_var} ${!ku_pwd_var}
 }
 
 ./waitForDatabase.sh
