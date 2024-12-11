@@ -44,18 +44,23 @@ Build dina-db-init-container container:
 
 See `docker-compose` file in the `example` folder.
 
+# Postgres Database Server
 
-# Version 2
-v2 aims at making db-init-container more generic so it can be used to setup databases that are not used by a dina module.
+Information about the Postgres Database Server and the default database.
+This section is mandatory for all operations.
 
-The following environment variables will use the already existing `mydb` to create the provided user (including `GRANT CONNECT`).
 ```
-USE_V2: true
 POSTGRES_DB: mydb
 POSTGRES_USER: pguser
 POSTGRES_PASSWORD: pg1234
 POSTGRES_HOST: dina-db
+```
 
+# Non-DINA database
+`db-init-container` can be used to setup databases that are not used by a dina module (e.g. Keycloak database).
+
+The following environment variables will use the already existing `mydb` to create the provided user (including `GRANT CONNECT`).
+```
 DB_USER: my_user
 DB_PASSWORD: secret_password
 ```
@@ -64,7 +69,7 @@ It is also possible to create a new database by additionally setting the variabl
 the user will be granted connect on that database.
 
 # RESTORE_DB
-Restore_DB aims at making db-init-container more flexible for deployment in allowing the database to be restore from a pg_dumpall generated backup.
+Allows to restore the database from a pg_dumpall generated backup.
 That way it can be used to replicate databases that require issue replication and/or assist in recovery scenarios.
 
 The first two environment variables below are needed for this feature, where a flag is set to enable the feature and the a file path is provided with the mounted
@@ -72,12 +77,19 @@ dump file within the container.
 ```
 RESTORE_DB: true
 DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql"
+```
+Note: the backup file from pg_dumpall will include all the users and credentials from the previous installation. If credentials are unknown,
+the `db-init-container` can reset them, so they are synchronized with the new deployment environment variables.
 
-POSTGRES_DB: mydb
-POSTGRES_USER: pguser
-POSTGRES_PASSWORD: pg1234
-POSTGRES_HOST: dina-db
+# RESET_USERS
 
-DB_USER: my_user
-DB_PASSWORD: secret_password
+Reset user's credentials with the ones in the environment variables.
+
+For DINA module, the following would reset the credentials for the collection module:
+```
+DINA_DB: collection
+MIGRATION_USER_collection: mu_coll
+MIGRATION_USER_PW_collection: new_mu_password
+WEB_USER_collection: wu_coll
+WEB_USER_PW_collection: new_wu_password
 ```
