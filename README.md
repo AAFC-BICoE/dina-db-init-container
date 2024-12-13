@@ -72,12 +72,19 @@ the user will be granted connect on that database.
 Allows to restore the database from a pg_dumpall generated backup.
 That way it can be used to replicate databases that require issue replication and/or assist in recovery scenarios.
 
-The first two environment variables below are needed for this feature, where a flag is set to enable the feature and the a file path is provided with the mounted
-dump file within the container.
+The mounted SQL dump file must be encoded in base64. The file can be converted using:
+
+```
+base64 sql_dump.sql > sql_dump.sql.b64
+```
+
+The first two environment variables below are needed for this feature, where a flag is set to enable the feature and the a file path is provided with the mounted dump file within the container.
+
 ```
 RESTORE_DB: true
 DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql.b64"
 ```
+
 Note: the backup file from pg_dumpall will include all the users and credentials from the previous installation. If credentials are unknown,
 the `db-init-container` can reset them, so they are synchronized with the new deployment environment variables.
 
