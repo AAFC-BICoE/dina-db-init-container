@@ -10,31 +10,33 @@ services:
 
   init-db:
     image: "aafcbicoe/dina-db-init-container:dev"
+#     volumes:
+#     - ./mount:/opt/pgrestore/data/ 
     environment:
 #     the database and the user must already be set on the Postgres server (done here by dina-db service)
       POSTGRES_DB: my_db
       POSTGRES_PASSWORD: pg1234
       POSTGRES_HOST: dina-db
       POSTGRES_USER: pguser
-
+      
 #  Example 1: non-dina database example
-#      DB_USER: keycloak_user
-#      DB_PASSWORD: kjasfkjfekjef
+#    DB_USER: keycloak_user
+#    DB_PASSWORD: kjasfkjfekjef
 
-#      to create a new database
-#      DB_NAME: my_db2
+#    to create a new database
+#    DB_NAME: my_db2
 
 #  Example 2 : DINA module
-#      DINA_DB: agent
+#    DINA_DB: agent
 #
-#      MIGRATION_USER_agent: migration_user_agent
-#      MIGRATION_USER_PW_agent: muagent123
-#      WEB_USER_agent: web_user_agent
-#      WEB_USER_PW_agent: wuagent321
+#    MIGRATION_USER_agent: migration_user_agent
+#    MIGRATION_USER_PW_agent: muagent123
+#    WEB_USER_agent: web_user_agent
+#    WEB_USER_PW_agent: wuagent321
 
 #  Example 3: Restore (make sure that there is a volume mount with the file
 #    RESTORE_DB: true
-#    DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql"
+#    DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql.b64"
 
 # Example 4: Reset Users
 #    RESET_USERS: true

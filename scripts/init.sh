@@ -67,11 +67,13 @@ resetDinaUser() {
     wu_pwd_var=WEB_USER_PW_${curr_db}
     ./resetUser.sh "${!wu_var}" "${!wu_pwd_var}"
     ./resetUser.sh "${!mu_var}" "${!mu_pwd_var}"
+    echo "Credentials have been reset for ${!wu_var} and ${!mu_var}."
   done
 }
 
 resetGenericDatabaseUser() {
   ./resetUser.sh "${DB_USER}" "${DB_PASSWORD}"
+  echo "Credentials have been reset for ${DB_USER}."
 }
 
 ./waitForDatabase.sh
@@ -86,7 +88,7 @@ if [ "${RESTORE_DB,,}" = "true" ]; then
 fi
 
 # Check if we are dealing with DINA module database(s)
-if [ -n "$DB_NAME" ]; then
+if [ -n "$DINA_DB" ]; then
   handleDinaModuleDatabase
   # if we need to reset users
   if [ "${RESET_USERS,,}" = "true" ]; then

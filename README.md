@@ -76,7 +76,7 @@ The first two environment variables below are needed for this feature, where a f
 dump file within the container.
 ```
 RESTORE_DB: true
-DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql"
+DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql.b64"
 ```
 Note: the backup file from pg_dumpall will include all the users and credentials from the previous installation. If credentials are unknown,
 the `db-init-container` can reset them, so they are synchronized with the new deployment environment variables.
@@ -87,6 +87,7 @@ Reset user's credentials with the ones in the environment variables.
 
 For DINA module, the following would reset the credentials for the collection module:
 ```
+RESET_USERS: true
 DINA_DB: collection
 MIGRATION_USER_collection: mu_coll
 MIGRATION_USER_PW_collection: new_mu_password
