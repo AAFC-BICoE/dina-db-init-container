@@ -40,6 +40,10 @@ fi
 # Print the decoded file path for debugging
 echo "Decoded dump file path: '$DECODED_DUMP_PATH'"
 
+# Remove $POSTGRES_USER SQL commands from the decoded dump file.
+sed -i "/^\(DROP\|CREATE\|ALTER\) ROLE $POSTGRES_USER.*;/d" $DECODED_DUMP_PATH
+echo "Removed '$POSTGRES_USER' SQL commands from the dump."
+
 # Check if PostgreSQL server is running
 echo "Checking PostgreSQL server connection..."
 pg_isready -h $POSTGRES_HOST -U $POSTGRES_USER
