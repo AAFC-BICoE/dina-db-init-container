@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   dina-db:
-    image: "postgres:10"
+    image: "postgres:13"
     environment:
       POSTGRES_DB: my_db
       POSTGRES_PASSWORD: pg1234
@@ -10,34 +10,41 @@ services:
 
   init-db:
     image: "aafcbicoe/dina-db-init-container:dev"
+#     volumes:
+#     - ./mount:/opt/pgrestore/data/ 
     environment:
-#     the database and the user must already be set on the Postgres server
+#     the database and the user must already be set on the Postgres server (done here by dina-db service)
       POSTGRES_DB: my_db
       POSTGRES_PASSWORD: pg1234
       POSTGRES_HOST: dina-db
       POSTGRES_USER: pguser
+      
+#  Example 1: non-dina database example
+#    DB_USER: keycloak_user
+#    DB_PASSWORD: kjasfkjfekjef
 
-#      v2 example
-#      USE_V2: true
-#      DB_USER: keycloak_user
-#      DB_PASSWORD: kjasfkjfekjef
+#    to create a new database
+#    DB_NAME: my_db2
 
-#      to create a new database
-#      DB_NAME: my_db2
+#  Example 2 : DINA module
+#    DINA_DB: agent
+#
+#    MIGRATION_USER_agent: migration_user_agent
+#    MIGRATION_USER_PW_agent: muagent123
+#    WEB_USER_agent: web_user_agent
+#    WEB_USER_PW_agent: wuagent321
 
-      DINA_DB: agent collection
+#  Example 3: Restore (make sure that there is a volume mount with the file
+#    RESTORE_DB: true
+#    DB_DUMP_FILE_PATH: "/opt/pgrestore/data/sql_dump.sql.b64"
 
-      PREFIX_agent: xzy
-      MIGRATION_USER_agent: migration_user_agent
-      MIGRATION_USER_PW_agent: muagent123
-      WEB_USER_agent: web_user_agent
-      WEB_USER_PW_agent: wuagent321
-
-      PG_EXTENSION_collection: pgcrypto
-      MIGRATION_USER_collection: migration_user_collection
-      MIGRATION_USER_PW_collection: mucoll123
-      WEB_USER_collection: web_user_collection
-      WEB_USER_PW_collection: wucoll321
-
+# Example 4: Reset Users
+#    RESET_USERS: true
+#    DINA_DB: agent
+#
+#    MIGRATION_USER_agent: migration_user_agent
+#    MIGRATION_USER_PW_agent: NEWmuagent123
+#    WEB_USER_agent: web_user_agent
+#    WEB_USER_PW_agent: NEWwuagent321
     depends_on:
       - "dina-db"
