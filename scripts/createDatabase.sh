@@ -3,7 +3,7 @@
 # This script will only run if the database does NOT already exist
 # arguments: (1) database name
 
-set +e
+set -euo pipefail
 
 export PGPASSWORD="$POSTGRES_PASSWORD"
 

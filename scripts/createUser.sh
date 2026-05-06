@@ -12,11 +12,22 @@ user_exists=$(psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -qt -c
 if [ "$user_exists" = "1" ]; then
   echo "User $1 already exists. Skipping..."
 else
-  echo "Creating user $1"
+  echo "Creating user $2"
   psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -qt -c "CREATE USER $2 NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"
 
-  psql -q -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -qt -c "ALTER USER $2 WITH PASSWORD '$3'"
+  local user_name="$2"
+  local user_password="$3"
+
+  # Set password (using heredoc)
+  psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" <<EOF || {
+    echo "Error: Failed to set password for user '$user_name'" >&2
+    exit 1
+  }
+  ALTER USER "$user_name" WITH PASSWORD E'$(echo "$user_password" | sed "s/'/''/g")';
+  EOF
+  
 
   echo "Grant connect to user $2 on database $1"
   psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" "$POSTGRES_DB" -qt -c "GRANT CONNECT ON DATABASE $1 TO $2;"
 fi
+
