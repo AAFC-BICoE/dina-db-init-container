@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:3.23
 RUN apk --no-cache add gettext postgresql-client bash
 RUN apk add --no-cache coreutils
 
