@@ -27,9 +27,10 @@ handleDinaModuleDatabase() {
     }
 
     # Handle extensions
-    local pg_ext_var="PG_EXTENSION_${curr_db}[@]"
-    local -a pg_ext=("${!pg_ext_var}")
-    
+    local pg_ext_var="PG_EXTENSION_${curr_db}"
+    local -a pg_ext
+    IFS=' ' read -r -a pg_ext <<< "${!pg_ext_var}"
+
     if [[ ${#pg_ext[@]} -gt 0 ]]; then
       local ext
       for ext in "${pg_ext[@]}"; do
