@@ -7,10 +7,10 @@ jobs:
     name: Build Docker Image and Push
     runs-on: ubuntu-latest
     env:
-      push_to_docker_hub: true
+      push_to_docker_hub: false
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set VERSION_TAG ENV variable
         run: |
           echo "VERSION_TAG=$(cat version.txt)" >> $GITHUB_ENV
