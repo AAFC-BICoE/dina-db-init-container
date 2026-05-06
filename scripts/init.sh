@@ -90,6 +90,10 @@ resetGenericDatabaseUser() {
   echo "Credentials have been reset for ${DB_USER}."
 }
 
+# Display db init container version and wait for database to be ready before doing anything.
+echo "========================================"
+echo "dina-db-init-container version: $(cat version.txt 2>/dev/null || echo "unknown")"
+echo "========================================"
 ./waitForDatabase.sh
 
 export PGPASSWORD="$POSTGRES_PASSWORD"
