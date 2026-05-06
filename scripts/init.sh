@@ -5,11 +5,18 @@ handleDinaModuleDatabase() {
   db_array=("$DINA_DB")
   for curr_db in ${db_array[@]}; do
     echo "DINA database : ${curr_db}"
+
+    base_db=${curr_db}
     mu_var=MIGRATION_USER_${curr_db}
     mu_pwd_var=MIGRATION_USER_PW_${curr_db}
     wu_var=WEB_USER_${curr_db}
     wu_pwd_var=WEB_USER_PW_${curr_db}
     db_schema_name=${curr_db}
+
+    # Define the extension variables without the database prefix.
+    local pg_ext_var="PG_EXTENSION_${base_db}"
+    local pg_ext_string="${!pg_ext_var:-}"
+    local -a pg_ext=($pg_ext_string)
 
     db_prefix_var=PREFIX_${curr_db}
     db_prefix=${!db_prefix_var}
@@ -26,11 +33,7 @@ handleDinaModuleDatabase() {
       return 1
     }
 
-    # Handle extensions
-    local pg_ext_var="PG_EXTENSION_${curr_db}"
-    local pg_ext_string="${!pg_ext_var:-}"
-    local -a pg_ext=($pg_ext_string)
-
+    # Create extensions if any are defined for this database.
     if [[ ${#pg_ext[@]} -gt 0 ]]; then
       local ext
       for ext in "${pg_ext[@]}"; do
