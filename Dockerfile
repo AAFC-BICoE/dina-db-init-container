@@ -10,6 +10,7 @@ WORKDIR /work
 
 COPY scripts/*.tmpl /work/
 COPY scripts/*.sh /work/
+COPY version.txt /work/
 RUN chmod +x /work/*.sh
 
 USER user

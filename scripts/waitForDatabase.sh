@@ -5,7 +5,7 @@ set +e
 export PGPASSWORD="$POSTGRES_PASSWORD"
 for i in {1..30}
    do
-      psql -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_DB -qt -c "SELECT 0"
+      psql -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_DB -qt -c "SELECT 1 WHERE false;"
       if [ 0 == "$?" ]; then
          echo 'Database ready'
          exit 0
