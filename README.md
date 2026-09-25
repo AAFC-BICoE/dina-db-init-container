@@ -55,9 +55,10 @@ CREATE TABLE dina_data_import (
 ```
 
 For each source database with pending rows:
- - If the source database doesn't exist, the rows are marked as `SOURCE_NOT_FOUND` (same for a source table that doesn't exist).
- - The source tables are read in a single transaction. Only the columns that are also in the target table are copied.
- - The target tables are loaded and the rows marked as `IMPORTED` in a single transaction.
+ - If the source database doesn't exist, the rows are marked as `SOURCE_NOT_FOUND`.
+ - The source tables are read in a single transaction. The target tables must be empty and have the same structure (columns and order) as the source tables.
+ - The target tables are loaded and the rows marked as `IMPORTED` in a single transaction, in the order of the `dina_data_import` ids. Foreign keys are checked, so parent tables must be declared before their children.
+ - Data is copied as is, including ids, so the relationships are kept. The sequences of the target columns (`SERIAL`/identity) are moved after the imported values. Other sequences (not owned by a column) are not modified.
  - The imported source tables become owned by `POSTGRES_USER` to identify them as imported. The source database is not modified otherwise.
 
 Since the init-container runs before the module, the tables created by the module (e.g. Liquibase) are only found on the next run.
