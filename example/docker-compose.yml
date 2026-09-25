@@ -46,5 +46,14 @@ services:
 #    MIGRATION_USER_PW_agent: NEWmuagent123
 #    WEB_USER_agent: web_user_agent
 #    WEB_USER_PW_agent: NEWwuagent321
+
+# Example 5: Import the schema of the loan_transaction database into the collection database
+#    DINA_DB: collection
+#
+#    MIGRATION_USER_collection: migration_user_coll
+#    MIGRATION_USER_PW_collection: mucoll123
+#    WEB_USER_collection: web_user_coll
+#    WEB_USER_PW_collection: wucoll321
+#    IMPORT_SCHEMA_collection: loan_transaction
     depends_on:
       - "dina-db"

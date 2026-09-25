@@ -44,6 +44,24 @@ handleDinaModuleDatabase() {
         }
       done
     fi
+
+    # Import schema(s) of other DINA database(s) into this database if any are defined.
+    local import_var="IMPORT_SCHEMA_${base_db}"
+    local -a import_src=(${!import_var:-})
+    if [[ ${#import_src[@]} -gt 0 ]]; then
+      local src
+      for src in "${import_src[@]}"; do
+        local src_prefix_var="PREFIX_${src}"
+        local src_db=${src}
+        if [ -n "${!src_prefix_var}" ]; then
+          src_db=${!src_prefix_var}_${src}
+        fi
+        ./importDinaSchema.sh "${src_db}" "${src}" "${curr_db}" "${!mu_var}" || {
+          echo "Error: Failed to import schema ${src} into ${curr_db}" >&2
+          return 1
+        }
+      done
+    fi
   done
 }
 
@@ -110,7 +128,7 @@ fi
 
 # Check if we are dealing with DINA module database(s)
 if [ -n "$DINA_DB" ]; then
-  handleDinaModuleDatabase
+  handleDinaModuleDatabase || exit 1
   # if we need to reset users
   if [ "${RESET_USERS,,}" = "true" ]; then
     resetDinaUser

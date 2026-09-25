@@ -1,0 +1,45 @@
+-- Give the ownership of the imported schema and all its objects to the migration user of the target database.
+-- REASSIGN OWNED is not used since it would also reassign objects outside the schema (e.g. extensions).
+ALTER SCHEMA ${SCHEMA} OWNER TO ${MIGRATION_USER};
+
+DO $$
+DECLARE
+  r record;
+BEGIN
+  -- tables, views and sequences not linked to a table (linked sequences follow their table)
+  FOR r IN
+    SELECT c.relname,
+           CASE c.relkind WHEN 'S' THEN 'SEQUENCE' WHEN 'v' THEN 'VIEW' WHEN 'm' THEN 'MATERIALIZED VIEW' ELSE 'TABLE' END AS obj_type
+    FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = '${SCHEMA}'
+      AND c.relkind IN ('r', 'p', 'v', 'm', 'S')
+      AND NOT (c.relkind = 'S' AND EXISTS (
+        SELECT 1 FROM pg_depend d
+        WHERE d.classid = 'pg_class'::regclass AND d.objid = c.oid AND d.deptype IN ('a', 'i')))
+  LOOP
+    EXECUTE format('ALTER %s %I.%I OWNER TO %I', r.obj_type, '${SCHEMA}', r.relname, '${MIGRATION_USER}');
+  END LOOP;
+
+  -- enums, domains, ranges and standalone composite types (array types follow their element type)
+  FOR r IN
+    SELECT t.typname
+    FROM pg_type t
+      JOIN pg_namespace n ON n.oid = t.typnamespace
+      LEFT JOIN pg_class c ON c.oid = t.typrelid
+    WHERE n.nspname = '${SCHEMA}'
+      AND (t.typtype IN ('e', 'd', 'r') OR (t.typtype = 'c' AND c.relkind = 'c'))
+  LOOP
+    EXECUTE format('ALTER TYPE %I.%I OWNER TO %I', '${SCHEMA}', r.typname, '${MIGRATION_USER}');
+  END LOOP;
+
+  -- functions and procedures
+  FOR r IN
+    SELECT p.proname, pg_get_function_identity_arguments(p.oid) AS args
+    FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = '${SCHEMA}'
+  LOOP
+    EXECUTE format('ALTER ROUTINE %I.%I(%s) OWNER TO %I', '${SCHEMA}', r.proname, r.args, '${MIGRATION_USER}');
+  END LOOP;
+END $$;

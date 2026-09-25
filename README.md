@@ -37,6 +37,19 @@ PG_EXTENSION_dbname: MyExtention1 MyOtherExtention
 ```
 Note that the extension must be available on the server.
 
+The schema of other DINA database(s) can be imported (copied) into a DINA database, seperate multiple source databases with a space:
+
+```
+IMPORT_SCHEMA_dbname: sourcedbname
+```
+
+For example, `IMPORT_SCHEMA_collection: loan_transaction` copies the schema `loan_transaction` of the database `loan_transaction` into the
+database `collection`. `PREFIX_sourcedbname` is used to find the source database if provided. The import is done once:
+ - The source database is skipped if it doesn't exist or if its schema has no tables.
+ - The source schema is frozen: all write privileges on its tables are revoked and all sessions on the source database are terminated. The source database is kept as a read-only archive.
+ - The schema is copied (same name) into the target database in a single transaction and becomes owned by the migration user of the target database. It is a staging schema: the target module is responsible to consume it (e.g. with a Liquibase changeset) and drop it.
+ - The import is recorded in the table `public.dina_schema_import` of the target database (same transaction), subsequent runs will skip it.
+
 ## Example
 
 Build dina-db-init-container container:
