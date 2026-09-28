@@ -1,0 +1,20 @@
+-- Import the data of ${SOURCE_TABLE} into ${TARGET_SCHEMA}.${TARGET_TABLE}
+\copy ${TARGET_SCHEMA}.${TARGET_TABLE} FROM '${DATA_FILE}'
+
+-- Move the sequences of the columns (serial/identity) after the imported values
+DO $$
+DECLARE
+  col record;
+BEGIN
+  FOR col IN
+    SELECT column_name, pg_get_serial_sequence('${TARGET_SCHEMA}.${TARGET_TABLE}', column_name) AS sequence_name
+    FROM information_schema.columns
+    WHERE table_schema = '${TARGET_SCHEMA}' AND table_name = '${TARGET_TABLE}'
+  LOOP
+    IF col.sequence_name IS NOT NULL THEN
+      EXECUTE format('SELECT setval(%L, max(%I)) FROM ${TARGET_SCHEMA}.${TARGET_TABLE}', col.sequence_name, col.column_name);
+    END IF;
+  END LOOP;
+END $$;
+
+UPDATE ${TARGET_SCHEMA}.dina_data_import SET status = 'IMPORTED', processed_on = now() WHERE id = ${IMPORT_ID};

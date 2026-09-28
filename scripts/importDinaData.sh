@@ -26,6 +26,7 @@ run_psql() {
   psql -U "$POSTGRES_USER" -h "$POSTGRES_HOST" -v ON_ERROR_STOP=1 -qtA "$db" "$@"
 }
 
+# Nothing to import if the module didn't create the dina_data_import table
 if [ "$(run_psql "$target_db" -c "SELECT to_regclass('${data_import_table}') IS NOT NULL")" != "t" ]; then
   exit 0
 fi
@@ -33,6 +34,7 @@ fi
 work_dir=$(mktemp -d) || exit 1
 trap 'rm -rf "$work_dir"' EXIT
 
+# For each source database with pending tables
 while read -r src_base_db src_schema; do
   prefix_var="PREFIX_${src_base_db}"
   src_db=${src_base_db}
@@ -46,22 +48,28 @@ while read -r src_base_db src_schema; do
   fi
 
   echo "Importing data from database ${src_db} into database ${target_db}"
+
+  # Build the scripts:
+  #  export.sql: run on the source database, exports all the tables in a single transaction
+  #  import.sql: run on the target database in a single transaction, see import-data-table.sql.tmpl
+  #  owner.sql: run on the source database after the import, changes the owner of the imported tables
   echo "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY;" > "${work_dir}/export.sql"
   : > "${work_dir}/import.sql"
   : > "${work_dir}/owner.sql"
 
   while IFS='|' read -r id src_table target_table; do
     echo "  ${src_schema}.${src_table} -> ${target_schema}.${target_table}"
-    echo "\\copy ${src_schema}.${src_table} TO '${work_dir}/${id}.copy'" >> "${work_dir}/export.sql"
-    echo "\\copy ${target_schema}.${target_table} FROM '${work_dir}/${id}.copy'" >> "${work_dir}/import.sql"
-    # move the sequences of the target table columns (serial/identity) after the imported values
-    echo "SELECT format('SELECT setval(%L, max(%I)) FROM %s', pg_get_serial_sequence(attrelid::regclass::text, attname), attname, attrelid::regclass) FROM pg_attribute WHERE attrelid = '${target_schema}.${target_table}'::regclass AND attnum > 0 AND NOT attisdropped AND pg_get_serial_sequence(attrelid::regclass::text, attname) IS NOT NULL \\gexec" >> "${work_dir}/import.sql"
-    echo "UPDATE ${data_import_table} SET status = 'IMPORTED', processed_on = now() WHERE id = ${id};" >> "${work_dir}/import.sql"
+    data_file="${work_dir}/${id}.copy"
+
+    echo "\\copy ${src_schema}.${src_table} TO '${data_file}'" >> "${work_dir}/export.sql"
+    SOURCE_TABLE="${src_schema}.${src_table}" TARGET_SCHEMA=$target_schema TARGET_TABLE=$target_table DATA_FILE=$data_file IMPORT_ID=$id \
+      envsubst < import-data-table.sql.tmpl >> "${work_dir}/import.sql"
     echo "ALTER TABLE ${src_schema}.${src_table} OWNER TO ${POSTGRES_USER};" >> "${work_dir}/owner.sql"
   done < <(run_psql "$target_db" -c "SELECT id, source_table, target_table FROM ${data_import_table} WHERE ${pending} ORDER BY id")
 
   echo "COMMIT;" >> "${work_dir}/export.sql"
 
+  # Run the scripts
   run_psql "$src_db" -f "${work_dir}/export.sql" > /dev/null || exit 1
   run_psql "$target_db" --single-transaction -f "${work_dir}/import.sql" > /dev/null || exit 1
   run_psql "$src_db" -f "${work_dir}/owner.sql" > /dev/null
