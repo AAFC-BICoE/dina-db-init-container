@@ -44,6 +44,12 @@ handleDinaModuleDatabase() {
         }
       done
     fi
+
+    # Import data from other DINA database(s) if requested by the module (dina_data_import table).
+    ./importDinaData.sh "${curr_db}" "${db_schema_name}" || {
+      echo "Error: Failed to import data into ${curr_db}" >&2
+      return 1
+    }
   done
 }
 
@@ -110,7 +116,7 @@ fi
 
 # Check if we are dealing with DINA module database(s)
 if [ -n "$DINA_DB" ]; then
-  handleDinaModuleDatabase
+  handleDinaModuleDatabase || exit 1
   # if we need to reset users
   if [ "${RESET_USERS,,}" = "true" ]; then
     resetDinaUser

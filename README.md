@@ -37,6 +37,32 @@ PG_EXTENSION_dbname: MyExtention1 MyOtherExtention
 ```
 Note that the extension must be available on the server.
 
+## Data import
+
+Data from other DINA database(s) can be imported (copied) into the tables of a DINA database. There is no environment variable, the
+import is requested by the module itself (e.g. with Liquibase) by creating the target tables and the following table in its schema:
+
+```sql
+CREATE TABLE dina_data_import (
+  id SERIAL PRIMARY KEY,
+  source_database varchar(100) NOT NULL, -- without prefix, PREFIX_sourcedbname is used if provided
+  source_schema varchar(100) NOT NULL,
+  source_table varchar(100) NOT NULL,
+  target_table varchar(100) NOT NULL,    -- in the same schema as dina_data_import
+  status varchar(50),                    -- null means pending
+  processed_on timestamptz
+);
+```
+
+For each source database with pending rows:
+ - If the source database doesn't exist, the rows are marked as `SOURCE_NOT_FOUND`.
+ - The source tables are read in a single transaction. The target tables must be empty and have the same structure (columns and order) as the source tables.
+ - The target tables are loaded and the rows marked as `IMPORTED` in a single transaction, in the order of the `dina_data_import` ids. Foreign keys are checked, so parent tables must be declared before their children.
+ - Data is copied as is, including ids, so the relationships are kept. The sequences of the target columns (`SERIAL`/identity) are moved after the imported values. Other sequences (not owned by a column) are not modified.
+ - The imported source tables become owned by `POSTGRES_USER` to identify them as imported. The source database is not modified otherwise.
+
+Since the init-container runs before the module, the tables created by the module (e.g. Liquibase) are only found on the next run.
+
 ## Example
 
 Build dina-db-init-container container:
