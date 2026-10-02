@@ -7,7 +7,7 @@ jobs:
     name: Build Docker Image and Push
     runs-on: ubuntu-latest
     env:
-      push_to_docker_hub: false
+      push_to_docker_hub: true
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v6
@@ -30,9 +30,11 @@ jobs:
 
       - name: Build Image and Push
         if: env.push_to_docker_hub == 'true'
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: aafcbicoe/dina-db-init-container:${{ env.VERSION_TAG }}
           provenance: false
+          # Force the builder engine to output standard Docker mediatypes for OKD
+          outputs: type=image,oci-mediatypes=false
