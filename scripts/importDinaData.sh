@@ -34,8 +34,7 @@ run_psql() {
 
 # Logs one line per row of the dina_data_import table, e.g. "#1 loan_transaction.transaction -> collection.transaction: pending"
 log_data_imports() {
-  run_psql "$target_db" -c "SELECT format('  #%s %s.%s -> ${target_schema}.%s%s: %s', id, source_schema, source_table, target_table,
-      CASE WHEN source_database <> source_schema THEN ' (from database ' || quote_literal(source_database) || ')' ELSE '' END,
+  run_psql "$target_db" -c "SELECT format('  #%s %s.%s -> ${target_schema}.%s: %s', id, source_schema, source_table, target_table,
       CASE WHEN status IS NULL THEN 'pending'
            WHEN status = '' THEN 'status is an empty string, not pending (pending rows have a NULL status)'
            ELSE status || coalesce(' on ' || to_char(processed_on, 'YYYY-MM-DD HH24:MI:SS TZ'), '') END)
