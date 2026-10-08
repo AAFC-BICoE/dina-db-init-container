@@ -1,5 +1,6 @@
 -- Import the data of ${SOURCE_TABLE} into ${TARGET_SCHEMA}.${TARGET_TABLE}
 \copy ${TARGET_SCHEMA}.${TARGET_TABLE} FROM '${DATA_FILE}'
+SELECT '    ' || count(*) || ' rows imported into ${TARGET_SCHEMA}.${TARGET_TABLE}' FROM ${TARGET_SCHEMA}.${TARGET_TABLE};
 
 -- Move the sequences of the columns (serial/identity) after the imported values
 DO $$
